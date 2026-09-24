@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repositorio de Recetas - Grupo de Restaurantes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
+
+    <!-- URL DE LA API DE GOOGLE -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyCscVqzfma7EW6JVXKCHYpjypZZTvKHrXOIQcF1wvAHWYKImFJhhbkc2YS9iMt0vPqBg/exec";
+    </script>
+
+    <!-- NAVEGACIÓN Y CABECERA -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid font-bold text-amber-500 text-2xl fa-utensils"></i>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Repositorio de Recetas</h1>
+                    <p class="text-xs text-slate-400">Grupo de Restaurantes</p>
+                </div>
+            </div>
+            <div id="userStatus" class="flex items-center space-x-4 text-sm">
+                <!-- Estado del usuario se renderiza por JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        
+        <!-- PANTALLA DE LOGIN -->
+        <div id="loginView" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-slate-200 mt-10 no-print">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Acceso al Sistema</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Usuario</label>
+                    <input type="text" id="loginUsername" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+                    <input type="password" id="loginPassword" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg transition">Iniciar Sesión</button>
+            </form>
+            <div class="mt-6 p-4 bg-slate-50 rounded-lg text-xs text-slate-600 space-y-1 border">
+                <p class="font-bold">Credenciales de prueba:</p>
+                <p>• <b>SuperAdmin:</b> superadmin / admin123</p>
+                <p>• <b>Chef / Editor:</b> chef_ason / chef123</p>
+                <p>• <b>Cocinero:</b> cocinero_nm / cocinero123</p>
+            </div>
+        </div>
+
+        <!-- PANEL APP PRINCIPAL (Oculto inicialmente) -->
+        <div id="appView" class="hidden space-y-6">
+            
+            <!-- BARRA DE FILTROS Y ACCIONES -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-4 justify-between items-center no-print">
+                <div class="flex flex-wrap gap-3 flex-1 min-w-[300px]">
+                    <input type="text" id="searchInput" oninput="renderRecipes()" placeholder="Buscar receta o ingrediente..." class="px-3 py-2 border rounded-lg text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-amber-500">
+                    <select id="filterRestaurante" onchange="renderRecipes()" class="px-3 py-2 border rounded-lg text-sm bg-white outline-none">
+                        <option value="TODOS">Todos los Restaurantes</option>
+                        <option value="Sidreria del Asón">Sidreria del Asón</option>
+                        <option value="Nuevo Mundo">Nuevo Mundo</option>
+                        <option value="Cascarilla">Cascarilla</option>
+                        <option value="Pruebas I+D">Pruebas I+D</option>
+                    </select>
+                    <select id="filterCategoria" onchange="renderRecipes()" class="px-3 py-2 border rounded-lg text-sm bg-white outline-none">
+                        <option value="TODAS">Todas las Categorías</option>
+                        <option value="Elaboración">Elaboración</option>
+                        <option value="Entrantes">Entrantes</option>
+                        <option value="Segundos">Segundos</option>
+                        <option value="Postres">Postres</option>
+                        <option value="Menú primeros">Menú primeros</option>
+                        <option value="Menú segundos">Menú segundos</option>
+                    </select>
+                </div>
+                <div id="actionButtons" class="flex items-center space-x-2">
+                    <!-- Botón crear receta renderizado según rol -->
+                </div>
+            </div>
+
+            <!-- GRID DE RECETAS -->
+            <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
+                <!-- Se cargan por JS -->
+            </div>
+
+            <!-- PANEL SUPERADMIN (Oculto) -->
+            <div id="adminPanel" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print space-y-6">
+                <h2 class="text-xl font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-user-shield text-amber-600 mr-2"></i>Gestión de Usuarios</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-sm mb-3">Crear / Editar Usuario</h3>
+                        <form id="userForm" onsubmit="handleSaveUser(event)" class="space-y-3">
+                            <input type="text" id="adminUserUsername" placeholder="Usuario" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            <input type="password" id="adminUserPassword" placeholder="Contraseña" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            <input type="text" id="adminUserNombre" placeholder="Nombre Completo" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            <select id="adminUserRol" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                <option value="consulta">Solo Consulta</option>
+                                <option value="editor">Chef / Editor</option>
+                                <option value="superadmin">Super Administrador</option>
+                            </select>
+                            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-lg text-sm w-full">Guardar Usuario</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm mb-3">Usuarios Registrados</h3>
+                        <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                            <!-- JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA DETALLE Y FICHA DE IMPRESIÓN (PDF) -->
+            <div id="recipeDetailModal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+                <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 relative shadow-2xl">
+                    <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                    <div id="detailContent">
+                        <!-- Renderizado de la Ficha Técnica por JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        let currentUser = null;
+        let recipes = [
+            {
+                id: "REC-00160",
+                nombre: "RACIÓN DE SPAGHETTI CARBONARA",
+                restaurantes: ["Nuevo Mundo", "Pruebas I+D"],
+                categoria: "Segundos",
+                codCuiner: "00160",
+                fecha: "2017-07-21",
+                raciones: 1,
+                rendimiento: "No registrado",
+                ingredientes: [
+                    { un: "GR", bruto: 50, neto: 50, nombre: "GUANCIALE", cod: "401098", mise: "MIREPOIX" },
+                    { un: "ML", bruto: 12, neto: 12, nombre: "ACEITE OLIVA VIRGEN EXTRA 5L", cod: "1102005", mise: "2 VUELTAS" },
+                    { un: "ML", bruto: 120, neto: 120, nombre: "KEN NATA CULINARIA 1L", cod: "501007", mise: "2 CAZOS" },
+                    { un: "GR", bruto: 1, neto: 1, nombre: "PIMIENTA NEGRA EN GRANO", cod: "1013019", mise: "" },
+                    { un: "UD", bruto: 1, neto: 1, nombre: "HUEVOS", cod: "1002009", mise: "" },
+                    { un: "GR", bruto: 40, neto: 40, nombre: "PECORINO ROMANO", cod: "506138", mise: "Rallado" },
+                    { un: "GR", bruto: 5, neto: 5, nombre: "PECORINO ROMANO", cod: "506138", mise: "Rallado para decorar" },
+                    { un: "GR", bruto: 60, neto: 60, nombre: "AGUA DE COCCIÓN", cod: "NF3", mise: "1 cazo" },
+                    { un: "GR", bruto: 35, neto: 35, nombre: "CEBOLLA POCHADA", cod: "01102", mise: "" },
+                    { un: "GR", bruto: 220, neto: 220, nombre: "SPAGHETTI PRECOCIDOS", cod: "00161", mise: "" }
+                ],
+                alergenos: ["Huevos", "Lácteos", "Gluten"],
+                dietas: [],
+                material: "SARTÉN Nº24, CAZO 6.5, PINZAS, COCEDERO",
+                elaboracion: "1. En la sartén poner GUANCIALE + CEBOLLA CONFITADA + ACEITE.\n2. Cortar la cocción con AGUA y añadir la NATA.\n3. Hidratar los SPAGHETTI.\n4. Añadir la pasta a la sartén y cocinar todo junto 1-2 minutos.\n5. Fuera de fuego, añadir un HUEVO y el PECORINO. Mezclar enérgicamente.\n6. Emplatar y decorar con el PECORINO RALLADO + PIMIENTA NEGRA MOLIDA.",
+                puntosCriticos: "No agregar el huevo a fuego directo para evitar que se cuaje.",
+                imagenUrl: "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=600&q=80"
+            }
+        ];
+
+        let users = [
+            { username: "superadmin", password: "admin123", nombre: "Super Administrador", rol: "superadmin" },
+            { username: "chef_ason", password: "chef123", nombre: "Chef Sidrería del Asón", rol: "editor" },
+            { username: "cocinero_nm", password: "cocinero123", nombre: "Cocinero Nuevo Mundo", rol: "consulta" }
+        ];
+
+        async function initApp() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                if (data.recipes && data.recipes.length > 0) recipes = data.recipes;
+                if (data.users && data.users.length > 0) users = data.users;
+            } catch (e) {
+                console.log("Cargado modo local/demostración.");
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById("loginUsername").value;
+            const p = document.getElementById("loginPassword").value;
+            const found = users.find(x => x.username === u && x.password === p);
+            if (found) {
+                currentUser = found;
+                document.getElementById("loginView").classList.add("hidden");
+                document.getElementById("appView").classList.remove("hidden");
+                renderHeader();
+                renderRecipes();
+                if (currentUser.rol === 'superadmin') renderUsersList();
+            } else {
+                alert("Usuario o contraseña incorrectos.");
+            }
+        }
+
+        function renderHeader() {
+            const container = document.getElementById("userStatus");
+            container.innerHTML = `
+                <div class="text-right">
+                    <div class="font-bold">${currentUser.nombre}</div>
+                    <div class="text-xs text-amber-400 capitalize">${currentUser.rol}</div>
+                </div>
+                ${currentUser.rol === 'superadmin' ? '<button onclick="toggleAdminPanel()" class="bg-amber-600 hover:bg-amber-700 px-3 py-1 rounded text-xs font-bold">Panel Admin</button>' : ''}
+                <button onclick="logout()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
+            `;
+
+            const btnContainer = document.getElementById("actionButtons");
+            if (currentUser.rol !== 'consulta') {
+                btnContainer.innerHTML = `<button onclick="openRecipeForm()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg text-sm"><i class="fa-solid fa-plus mr-2"></i>Nueva Receta</button>`;
+            } else {
+                btnContainer.innerHTML = '';
+            }
+        }
+
+        function renderRecipes() {
+            const grid = document.getElementById("recipesGrid");
+            const search = document.getElementById("searchInput").value.toLowerCase();
+            const rest = document.getElementById("filterRestaurante").value;
+            const cat = document.getElementById("filterCategoria").value;
+
+            const filtered = recipes.filter(r => {
+                const matchSearch = r.nombre.toLowerCase().includes(search) || r.ingredientes.some(i => i.nombre.toLowerCase().includes(search));
+                const matchRest = rest === 'TODOS' || r.restaurantes.includes(rest);
+                const matchCat = cat === 'TODAS' || r.categoria === cat;
+                return matchSearch && matchRest && matchCat;
+            });
+
+            grid.innerHTML = filtered.map(r => `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
+                    <div class="h-40 bg-slate-200 relative">
+                        <img src="${r.imagenUrl || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=600&q=80'}" class="w-full h-full object-cover">
+                        <span class="absolute top-2 right-2 bg-slate-900/80 text-white text-xs px-2 py-1 rounded-md">${r.categoria}</span>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <h3 class="font-bold text-slate-800 text-base line-clamp-1">${r.nombre}</h3>
+                        <div class="flex flex-wrap gap-1">
+                            ${r.restaurantes.map(rest => `<span class="bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-0.5 rounded">${rest}</span>`).join('')}
+                        </div>
+                        <div class="text-xs text-slate-500 flex justify-between pt-2 border-t">
+                            <span>Cód: ${r.codCuiner || 'N/A'}</span>
+                            <span>${r.ingredientes.length} Ingredientes</span>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="viewDetail('${r.id}')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-2 rounded font-medium">Ver Ficha</button>
+                            <button onclick="printRecipe('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs"><i class="fa-solid fa-print"></i></button>
+                            ${currentUser.rol !== 'consulta' ? `<button onclick="cloneRecipe('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded text-xs font-semibold" title="Clonar receta">Clonar</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewDetail(id) {
+            const r = recipes.find(x => x.id === id);
+            if (!r) return;
+            const modal = document.getElementById("recipeDetailModal");
+            const content = document.getElementById("detailContent");
+            
+            content.innerHTML = `
+                <div class="flex justify-between items-start border-b pb-4 no-print">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">${r.nombre}</h2>
+                        <p class="text-xs text-slate-500">Cód Cuiner: ${r.codCuiner || 'N/A'} | Fecha: ${r.fecha} | Raciones: ${r.raciones}</p>
+                    </div>
+                    <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> Imprimir / PDF
+                    </button>
+                </div>
+
+                <!-- FICHA TÉCNICA FORMATO OFICIAL IMPRESIÓN -->
+                <div class="space-y-6 pt-2">
+                    <div class="border-b pb-3">
+                        <h1 class="text-xl font-bold text-slate-900 uppercase">${r.nombre} :: RECETA</h1>
+                        <div class="text-xs text-slate-600 grid grid-cols-2 gap-2 mt-2">
+                            <p><b>Restaurantes:</b> ${r.restaurantes.join(', ')}</p>
+                            <p><b>Tipo de plato:</b> ${r.categoria}</p>
+                            <p><b>Cod. Cuiner:</b> ${r.codCuiner || 'N/A'}</p>
+                            <p><b>Raciones:</b> ${r.raciones}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-xs uppercase text-slate-500 mb-2">INGREDIENTES</h3>
+                        <table class="w-full text-xs text-left border-collapse border border-slate-200">
+                            <thead class="bg-slate-100 border-b">
+                                <tr>
+                                    <th class="p-2 border">Un.</th>
+                                    <th class="p-2 border">Bruto</th>
+                                    <th class="p-2 border">Neto</th>
+                                    <th class="p-2 border">Nombre ingrediente</th>
+                                    <th class="p-2 border">Código Cuiner</th>
+                                    <th class="p-2 border">Mise-En-Place</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${r.ingredientes.map(i => `
+                                    <tr class="border-b">
+                                        <td class="p-2 border">${i.un}</td>
+                                        <td class="p-2 border">${i.bruto}</td>
+                                        <td class="p-2 border">${i.neto}</td>
+                                        <td class="p-2 border font-bold">${i.nombre}</td>
+                                        <td class="p-2 border">${i.cod}</td>
+                                        <td class="p-2 border">${i.mise}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-xs">
+                        <p><b>Alérgenos:</b> ${r.alergenos.length ? r.alergenos.join(', ') : 'Ninguno registrado'}</p>
+                        <p><b>Materiales:</b> ${r.material || 'No registrado'}</p>
+                    </div>
+
+                    <div class="text-xs space-y-1">
+                        <h3 class="font-bold uppercase text-slate-500">ELABORACIÓN:</h3>
+                        <p class="whitespace-pre-line leading-relaxed text-slate-700 bg-slate-50 p-3 rounded border">${r.elaboracion}</p>
+                    </div>
+
+                    ${r.puntosCriticos ? `
+                        <div class="text-xs space-y-1">
+                            <h3 class="font-bold uppercase text-red-600">PUNTOS CRÍTICOS:</h3>
+                            <p class="text-slate-700 bg-red-50 p-2 rounded border border-red-200">${r.puntosCriticos}</p>
+                        </div>
+                    ` : ''}
+
+                    ${r.imagenUrl ? `
+                        <div class="page-break pt-4">
+                            <h3 class="font-bold text-xs uppercase text-slate-500 mb-2">${r.nombre} :: IMAGEN EMPLATADO</h3>
+                            <img src="${r.imagenUrl}" class="max-h-80 rounded border object-cover">
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("recipeDetailModal").classList.add("hidden");
+        }
+
+        function cloneRecipe(id) {
+            const r = recipes.find(x => x.id === id);
+            if (!r) return;
+            const dest = prompt("¿A qué restaurante deseas clonar esta receta? (Ej: Sidreria del Asón, Nuevo Mundo, Cascarilla, Pruebas I+D)");
+            if (dest && !r.restaurantes.includes(dest)) {
+                const newRec = JSON.parse(JSON.stringify(r));
+                newRec.id = "REC-" + Math.floor(Math.random() * 90000 + 10000);
+                newRec.restaurantes = [dest];
+                newRec.nombre = newRec.nombre + " (Copia " + dest + ")";
+                recipes.push(newRec);
+                renderRecipes();
+                alert("Receta clonada con éxito para " + dest);
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById("appView").classList.add("hidden");
+            document.getElementById("loginView").classList.remove("hidden");
+        }
+
+        function toggleAdminPanel() {
+            const p = document.getElementById("adminPanel");
+            p.classList.toggle("hidden");
+        }
+
+        function printRecipe(id) {
+            viewDetail(id);
+            setTimeout(() => window.print(), 300);
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
