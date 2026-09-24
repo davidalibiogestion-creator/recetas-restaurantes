@@ -32,9 +32,7 @@
                     <p class="text-xs text-slate-400">Grupo de Restaurantes</p>
                 </div>
             </div>
-            <div id="userStatus" class="flex items-center space-x-4 text-sm">
-                <!-- Estado del usuario se renderiza por JS -->
-            </div>
+            <div id="userStatus" class="flex items-center space-x-4 text-sm"></div>
         </div>
     </header>
 
@@ -63,7 +61,7 @@
             </div>
         </div>
 
-        <!-- PANEL APP PRINCIPAL (Oculto inicialmente) -->
+        <!-- PANEL APP PRINCIPAL -->
         <div id="appView" class="hidden space-y-6">
             
             <!-- BARRA DE FILTROS Y ACCIONES -->
@@ -87,17 +85,13 @@
                         <option value="Menú segundos">Menú segundos</option>
                     </select>
                 </div>
-                <div id="actionButtons" class="flex items-center space-x-2">
-                    <!-- Botón crear receta renderizado según rol -->
-                </div>
+                <div id="actionButtons" class="flex items-center space-x-2"></div>
             </div>
 
             <!-- GRID DE RECETAS -->
-            <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
-                <!-- Se cargan por JS -->
-            </div>
+            <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print"></div>
 
-            <!-- PANEL SUPERADMIN (Oculto) -->
+            <!-- PANEL SUPERADMIN -->
             <div id="adminPanel" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print space-y-6">
                 <h2 class="text-xl font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-user-shield text-amber-600 mr-2"></i>Gestión de Usuarios</h2>
                 <div class="grid md:grid-cols-2 gap-6">
@@ -117,9 +111,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-sm mb-3">Usuarios Registrados</h3>
-                        <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                            <!-- JS -->
-                        </div>
+                        <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                     </div>
                 </div>
             </div>
@@ -128,9 +120,92 @@
             <div id="recipeDetailModal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
                 <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 relative shadow-2xl">
                     <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
-                    <div id="detailContent">
-                        <!-- Renderizado de la Ficha Técnica por JS -->
-                    </div>
+                    <div id="detailContent"></div>
+                </div>
+            </div>
+
+            <!-- MODAL CREAR / EDITAR RECETA -->
+            <div id="recipeEditModal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+                <div class="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 relative shadow-2xl">
+                    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                    <h2 id="modalFormTitle" class="text-xl font-bold text-slate-800 border-b pb-2">Crear / Editar Receta</h2>
+                    
+                    <form id="recipeForm" onsubmit="handleSaveRecipe(event)" class="space-y-4 text-sm">
+                        <input type="hidden" id="formRecipeId">
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-medium mb-1">Nombre de la Receta</label>
+                                <input type="text" id="formNombre" required class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1">Categoría</label>
+                                <select id="formCategoria" class="w-full px-3 py-2 border rounded-lg bg-white">
+                                    <option value="Elaboración">Elaboración</option>
+                                    <option value="Entrantes">Entrantes</option>
+                                    <option value="Segundos">Segundos</option>
+                                    <option value="Postres">Postres</option>
+                                    <option value="Menú primeros">Menú primeros</option>
+                                    <option value="Menú segundos">Menú segundos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block font-medium mb-1">Cód. Cuiner</label>
+                                <input type="text" id="formCodCuiner" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1">Raciones</label>
+                                <input type="number" id="formRaciones" value="1" min="1" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1">Rendimiento</label>
+                                <input type="text" id="formRendimiento" placeholder="Ej: 100%" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium mb-1">Restaurantes Asignados</label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center gap-1"><input type="checkbox" name="formRestaurantes" value="Sidreria del Asón"> Sidreria del Asón</label>
+                                <label class="flex items-center gap-1"><input type="checkbox" name="formRestaurantes" value="Nuevo Mundo"> Nuevo Mundo</label>
+                                <label class="flex items-center gap-1"><input type="checkbox" name="formRestaurantes" value="Cascarilla"> Cascarilla</label>
+                                <label class="flex items-center gap-1"><input type="checkbox" name="formRestaurantes" value="Pruebas I+D"> Pruebas I+D</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium mb-1">Materiales / Utillaje</label>
+                            <input type="text" id="formMaterial" placeholder="Ej: Sartén Nº24, Pinzas..." class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="font-medium">Elaboración (Pasos secuenciales)</label>
+                                <button type="button" onclick="startVoiceRecognition()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs px-2 py-1 rounded flex items-center gap-1 font-semibold">
+                                    <i class="fa-solid fa-microphone text-amber-600"></i> Dictar por voz
+                                </button>
+                            </div>
+                            <textarea id="formElaboracion" rows="4" required class="w-full px-3 py-2 border rounded-lg font-sans"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium mb-1">Puntos Críticos</label>
+                            <input type="text" id="formPuntosCriticos" placeholder="Advertencias de seguridad alimentaria o cocción" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium mb-1">URL Foto Emplatado</label>
+                            <input type="url" id="formImagenUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2 border-t">
+                            <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-lg hover:bg-slate-100">Cancelar</button>
+                            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg">Guardar Receta</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -254,12 +329,132 @@
                         </div>
                         <div class="flex gap-2 pt-2">
                             <button onclick="viewDetail('${r.id}')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-2 rounded font-medium">Ver Ficha</button>
-                            <button onclick="printRecipe('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs"><i class="fa-solid fa-print"></i></button>
-                            ${currentUser.rol !== 'consulta' ? `<button onclick="cloneRecipe('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded text-xs font-semibold" title="Clonar receta">Clonar</button>` : ''}
+                            <button onclick="printRecipe('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs" title="Imprimir PDF"><i class="fa-solid fa-print"></i></button>
+                            ${currentUser.rol !== 'consulta' ? `
+                                <button onclick="openRecipeForm('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs" title="Editar Receta"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="cloneRecipe('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded text-xs font-semibold" title="Clonar receta">Clonar</button>
+                                <button onclick="deleteRecipe('${r.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded text-xs font-bold" title="Eliminar Receta"><i class="fa-solid fa-trash"></i></button>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function openRecipeForm(id = null) {
+            const modal = document.getElementById("recipeEditModal");
+            const title = document.getElementById("modalFormTitle");
+            
+            if (id) {
+                const r = recipes.find(x => x.id === id);
+                if (!r) return;
+                title.innerText = "Editar Receta: " + r.nombre;
+                document.getElementById("formRecipeId").value = r.id;
+                document.getElementById("formNombre").value = r.nombre;
+                document.getElementById("formCategoria").value = r.categoria;
+                document.getElementById("formCodCuiner").value = r.codCuiner || "";
+                document.getElementById("formRaciones").value = r.raciones || 1;
+                document.getElementById("formRendimiento").value = r.rendimiento || "";
+                document.getElementById("formMaterial").value = r.material || "";
+                document.getElementById("formElaboracion").value = r.elaboracion || "";
+                document.getElementById("formPuntosCriticos").value = r.puntosCriticos || "";
+                document.getElementById("formImagenUrl").value = r.imagenUrl || "";
+
+                document.querySelectorAll('input[name="formRestaurantes"]').forEach(cb => {
+                    cb.checked = r.restaurantes.includes(cb.value);
+                });
+            } else {
+                title.innerText = "Nueva Receta";
+                document.getElementById("recipeForm").reset();
+                document.getElementById("formRecipeId").value = "";
+            }
+
+            modal.classList.remove("hidden");
+        }
+
+        function closeEditModal() {
+            document.getElementById("recipeEditModal").classList.add("hidden");
+        }
+
+        async function handleSaveRecipe(e) {
+            e.preventDefault();
+            const id = document.getElementById("formRecipeId").value || ("REC-" + Math.floor(Math.random() * 90000 + 10000));
+            const selectedRest = Array.from(document.querySelectorAll('input[name="formRestaurantes"]:checked')).map(cb => cb.value);
+
+            const recipeObj = {
+                id: id,
+                nombre: document.getElementById("formNombre").value,
+                categoria: document.getElementById("formCategoria").value,
+                codCuiner: document.getElementById("formCodCuiner").value,
+                raciones: Number(document.getElementById("formRaciones").value),
+                rendimiento: document.getElementById("formRendimiento").value,
+                restaurantes: selectedRest.length ? selectedRest : ["Pruebas I+D"],
+                material: document.getElementById("formMaterial").value,
+                elaboracion: document.getElementById("formElaboracion").value,
+                puntosCriticos: document.getElementById("formPuntosCriticos").value,
+                imagenUrl: document.getElementById("formImagenUrl").value,
+                ingredientes: recipes.find(x => x.id === id)?.ingredientes || [],
+                alergenos: recipes.find(x => x.id === id)?.alergenos || [],
+                fecha: new Date().toISOString().split('T')[0]
+            };
+
+            const index = recipes.findIndex(x => x.id === id);
+            if (index !== -1) {
+                recipes[index] = recipeObj;
+            } else {
+                recipes.push(recipeObj);
+            }
+
+            renderRecipes();
+            closeEditModal();
+
+            // Guardar en Google Sheets
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    redirect: "follow",
+                    body: JSON.stringify({ action: "SAVE_RECIPE", recipe: recipeObj })
+                });
+            } catch (err) {
+                console.log("Guardado local.");
+            }
+        }
+
+        function startVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("El dictado por voz no está soportado en este navegador. Utiliza Google Chrome.");
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                const field = document.getElementById("formElaboracion");
+                field.value = field.value ? field.value + " " + text : text;
+            };
+        }
+
+        async function deleteRecipe(id) {
+            const r = recipes.find(x => x.id === id);
+            if (!r) return;
+            
+            if (confirm(`¿Estás seguro de que deseas eliminar la receta "${r.nombre}"?`)) {
+                recipes = recipes.filter(x => x.id !== id);
+                renderRecipes();
+
+                try {
+                    await fetch(API_URL, {
+                        method: "POST",
+                        redirect: "follow",
+                        body: JSON.stringify({ action: "DELETE_RECIPE", id: id })
+                    });
+                } catch (e) {
+                    console.log("Acción notificada.");
+                }
+            }
         }
 
         function viewDetail(id) {
@@ -274,12 +469,21 @@
                         <h2 class="text-2xl font-bold text-slate-900">${r.nombre}</h2>
                         <p class="text-xs text-slate-500">Cód Cuiner: ${r.codCuiner || 'N/A'} | Fecha: ${r.fecha} | Raciones: ${r.raciones}</p>
                     </div>
-                    <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-print"></i> Imprimir / PDF
-                    </button>
+                    <div class="flex gap-2">
+                        ${currentUser.rol !== 'consulta' ? `
+                            <button onclick="openRecipeForm('${r.id}'); closeModal();" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </button>
+                            <button onclick="deleteRecipe('${r.id}'); closeModal();" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        ` : ''}
+                        <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Imprimir / PDF
+                        </button>
+                    </div>
                 </div>
 
-                <!-- FICHA TÉCNICA FORMATO OFICIAL IMPRESIÓN -->
                 <div class="space-y-6 pt-2">
                     <div class="border-b pb-3">
                         <h1 class="text-xl font-bold text-slate-900 uppercase">${r.nombre} :: RECETA</h1>
