@@ -22,11 +22,11 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyCscVqzfma7EW6JVXKCHYpjypZZTvKHrXOIQcF1wvAHWYKImFJhhbkc2YS9iMt0vPqBg/exec";
     </script>
 
-    <!-- NAVEGACIÓN Y CABECERA -->
+    <!-- CABECERA -->
     <header class="bg-slate-900 text-white shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <i class="fa-solid font-bold text-amber-500 text-2xl fa-utensils"></i>
+                <i class="fa-solid text-amber-500 text-2xl fa-utensils"></i>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">Repositorio de Recetas</h1>
                     <p class="text-xs text-slate-400">Grupo de Restaurantes</p>
@@ -39,7 +39,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 py-6">
         
-        <!-- PANTALLA DE LOGIN -->
+        <!-- LOGIN -->
         <div id="loginView" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-slate-200 mt-10 no-print">
             <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Acceso al Sistema</h2>
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
@@ -61,10 +61,10 @@
             </div>
         </div>
 
-        <!-- PANEL APP PRINCIPAL -->
+        <!-- PANEL PRINCIPAL -->
         <div id="appView" class="hidden space-y-6">
             
-            <!-- BARRA DE FILTROS Y ACCIONES -->
+            <!-- FILTROS Y BOTÓN NUEVA RECETA -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-4 justify-between items-center no-print">
                 <div class="flex flex-wrap gap-3 flex-1 min-w-[300px]">
                     <input type="text" id="searchInput" oninput="renderRecipes()" placeholder="Buscar receta o ingrediente..." class="px-3 py-2 border rounded-lg text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-amber-500">
@@ -88,35 +88,10 @@
                 <div id="actionButtons" class="flex items-center space-x-2"></div>
             </div>
 
-            <!-- GRID DE RECETAS -->
+            <!-- GRID RECETAS -->
             <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print"></div>
 
-            <!-- PANEL SUPERADMIN -->
-            <div id="adminPanel" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print space-y-6">
-                <h2 class="text-xl font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-user-shield text-amber-600 mr-2"></i>Gestión de Usuarios</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-bold text-sm mb-3">Crear / Editar Usuario</h3>
-                        <form id="userForm" onsubmit="handleSaveUser(event)" class="space-y-3">
-                            <input type="text" id="adminUserUsername" placeholder="Usuario" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                            <input type="password" id="adminUserPassword" placeholder="Contraseña" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                            <input type="text" id="adminUserNombre" placeholder="Nombre Completo" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                            <select id="adminUserRol" class="w-full px-3 py-2 border rounded-lg text-sm">
-                                <option value="consulta">Solo Consulta</option>
-                                <option value="editor">Chef / Editor</option>
-                                <option value="superadmin">Super Administrador</option>
-                            </select>
-                            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-lg text-sm w-full">Guardar Usuario</button>
-                        </form>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-sm mb-3">Usuarios Registrados</h3>
-                        <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VISTA DETALLE Y FICHA DE IMPRESIÓN (PDF) -->
+            <!-- MODAL VER RECETA / PDF -->
             <div id="recipeDetailModal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
                 <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 relative shadow-2xl">
                     <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
@@ -128,7 +103,7 @@
             <div id="recipeEditModal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
                 <div class="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 relative shadow-2xl">
                     <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
-                    <h2 id="modalFormTitle" class="text-xl font-bold text-slate-800 border-b pb-2">Crear / Editar Receta</h2>
+                    <h2 id="modalFormTitle" class="text-xl font-bold text-slate-800 border-b pb-2">Crear Receta</h2>
                     
                     <form id="recipeForm" onsubmit="handleSaveRecipe(event)" class="space-y-4 text-sm">
                         <input type="hidden" id="formRecipeId">
@@ -196,9 +171,22 @@
                             <input type="text" id="formPuntosCriticos" placeholder="Advertencias de seguridad alimentaria o cocción" class="w-full px-3 py-2 border rounded-lg">
                         </div>
 
+                        <!-- FOTO DEL EMPLATADO CON ADJUNTO Y CÁMARA -->
                         <div>
-                            <label class="block font-medium mb-1">URL Foto Emplatado</label>
-                            <input type="url" id="formImagenUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg">
+                            <label class="block font-medium mb-1">Foto del Emplatado</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <input type="file" id="formFileInput" accept="image/*" capture="environment" onchange="handleImageFileSelect(event)" class="hidden">
+                                    <button type="button" onclick="document.getElementById('formFileInput').click()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-2">
+                                        <i class="fa-solid fa-camera"></i> Adjuntar o hacer foto
+                                    </button>
+                                    <span id="fileNameDisplay" class="text-xs text-slate-500 italic">No se ha seleccionado imagen</span>
+                                </div>
+                                <input type="url" id="formImagenUrl" placeholder="O pega un enlace de imagen (https://...)" class="w-full px-3 py-2 border rounded-lg text-xs">
+                                <div id="imagePreviewContainer" class="hidden mt-2">
+                                    <img id="imagePreview" class="h-24 rounded border object-cover">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-end gap-2 pt-2 border-t">
@@ -212,40 +200,10 @@
         </div>
     </main>
 
-    <!-- LÓGICA DE LA APLICACIÓN -->
+    <!-- CÓDIGO JS -->
     <script>
         let currentUser = null;
-        let recipes = [
-            {
-                id: "REC-00160",
-                nombre: "RACIÓN DE SPAGHETTI CARBONARA",
-                restaurantes: ["Nuevo Mundo", "Pruebas I+D"],
-                categoria: "Segundos",
-                codCuiner: "00160",
-                fecha: "2017-07-21",
-                raciones: 1,
-                rendimiento: "No registrado",
-                ingredientes: [
-                    { un: "GR", bruto: 50, neto: 50, nombre: "GUANCIALE", cod: "401098", mise: "MIREPOIX" },
-                    { un: "ML", bruto: 12, neto: 12, nombre: "ACEITE OLIVA VIRGEN EXTRA 5L", cod: "1102005", mise: "2 VUELTAS" },
-                    { un: "ML", bruto: 120, neto: 120, nombre: "KEN NATA CULINARIA 1L", cod: "501007", mise: "2 CAZOS" },
-                    { un: "GR", bruto: 1, neto: 1, nombre: "PIMIENTA NEGRA EN GRANO", cod: "1013019", mise: "" },
-                    { un: "UD", bruto: 1, neto: 1, nombre: "HUEVOS", cod: "1002009", mise: "" },
-                    { un: "GR", bruto: 40, neto: 40, nombre: "PECORINO ROMANO", cod: "506138", mise: "Rallado" },
-                    { un: "GR", bruto: 5, neto: 5, nombre: "PECORINO ROMANO", cod: "506138", mise: "Rallado para decorar" },
-                    { un: "GR", bruto: 60, neto: 60, nombre: "AGUA DE COCCIÓN", cod: "NF3", mise: "1 cazo" },
-                    { un: "GR", bruto: 35, neto: 35, nombre: "CEBOLLA POCHADA", cod: "01102", mise: "" },
-                    { un: "GR", bruto: 220, neto: 220, nombre: "SPAGHETTI PRECOCIDOS", cod: "00161", mise: "" }
-                ],
-                alergenos: ["Huevos", "Lácteos", "Gluten"],
-                dietas: [],
-                material: "SARTÉN Nº24, CAZO 6.5, PINZAS, COCEDERO",
-                elaboracion: "1. En la sartén poner GUANCIALE + CEBOLLA CONFITADA + ACEITE.\n2. Cortar la cocción con AGUA y añadir la NATA.\n3. Hidratar los SPAGHETTI.\n4. Añadir la pasta a la sartén y cocinar todo junto 1-2 minutos.\n5. Fuera de fuego, añadir un HUEVO y el PECORINO. Mezclar enérgicamente.\n6. Emplatar y decorar con el PECORINO RALLADO + PIMIENTA NEGRA MOLIDA.",
-                puntosCriticos: "No agregar el huevo a fuego directo para evitar que se cuaje.",
-                imagenUrl: "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=600&q=80"
-            }
-        ];
-
+        let recipes = [];
         let users = [
             { username: "superadmin", password: "admin123", nombre: "Super Administrador", rol: "superadmin" },
             { username: "chef_ason", password: "chef123", nombre: "Chef Sidrería del Asón", rol: "editor" },
@@ -256,10 +214,9 @@
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                if (data.recipes && data.recipes.length > 0) recipes = data.recipes;
-                if (data.users && data.users.length > 0) users = data.users;
+                if (data.recipes) recipes = data.recipes;
             } catch (e) {
-                console.log("Cargado modo local/demostración.");
+                console.log("Servicio remoto cargado.");
             }
         }
 
@@ -274,7 +231,6 @@
                 document.getElementById("appView").classList.remove("hidden");
                 renderHeader();
                 renderRecipes();
-                if (currentUser.rol === 'superadmin') renderUsersList();
             } else {
                 alert("Usuario o contraseña incorrectos.");
             }
@@ -287,7 +243,6 @@
                     <div class="font-bold">${currentUser.nombre}</div>
                     <div class="text-xs text-amber-400 capitalize">${currentUser.rol}</div>
                 </div>
-                ${currentUser.rol === 'superadmin' ? '<button onclick="toggleAdminPanel()" class="bg-amber-600 hover:bg-amber-700 px-3 py-1 rounded text-xs font-bold">Panel Admin</button>' : ''}
                 <button onclick="logout()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
             `;
 
@@ -306,11 +261,16 @@
             const cat = document.getElementById("filterCategoria").value;
 
             const filtered = recipes.filter(r => {
-                const matchSearch = r.nombre.toLowerCase().includes(search) || r.ingredientes.some(i => i.nombre.toLowerCase().includes(search));
+                const matchSearch = r.nombre.toLowerCase().includes(search);
                 const matchRest = rest === 'TODOS' || r.restaurantes.includes(rest);
                 const matchCat = cat === 'TODAS' || r.categoria === cat;
                 return matchSearch && matchRest && matchCat;
             });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">No hay recetas guardadas todavía. ¡Haz clic en "+ Nueva Receta" para crear la primera!</div>`;
+                return;
+            }
 
             grid.innerHTML = filtered.map(r => `
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
@@ -323,22 +283,31 @@
                         <div class="flex flex-wrap gap-1">
                             ${r.restaurantes.map(rest => `<span class="bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-0.5 rounded">${rest}</span>`).join('')}
                         </div>
-                        <div class="text-xs text-slate-500 flex justify-between pt-2 border-t">
-                            <span>Cód: ${r.codCuiner || 'N/A'}</span>
-                            <span>${r.ingredientes.length} Ingredientes</span>
-                        </div>
                         <div class="flex gap-2 pt-2">
                             <button onclick="viewDetail('${r.id}')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-2 rounded font-medium">Ver Ficha</button>
-                            <button onclick="printRecipe('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs" title="Imprimir PDF"><i class="fa-solid fa-print"></i></button>
                             ${currentUser.rol !== 'consulta' ? `
-                                <button onclick="openRecipeForm('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs" title="Editar Receta"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="cloneRecipe('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded text-xs font-semibold" title="Clonar receta">Clonar</button>
-                                <button onclick="deleteRecipe('${r.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded text-xs font-bold" title="Eliminar Receta"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="openRecipeForm('${r.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteRecipe('${r.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
                             ` : ''}
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function handleImageFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Data = e.target.result;
+                    document.getElementById('formImagenUrl').value = base64Data;
+                    document.getElementById('imagePreview').src = base64Data;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         function openRecipeForm(id = null) {
@@ -359,6 +328,11 @@
                 document.getElementById("formElaboracion").value = r.elaboracion || "";
                 document.getElementById("formPuntosCriticos").value = r.puntosCriticos || "";
                 document.getElementById("formImagenUrl").value = r.imagenUrl || "";
+                
+                if (r.imagenUrl) {
+                    document.getElementById('imagePreview').src = r.imagenUrl;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                }
 
                 document.querySelectorAll('input[name="formRestaurantes"]').forEach(cb => {
                     cb.checked = r.restaurantes.includes(cb.value);
@@ -367,6 +341,8 @@
                 title.innerText = "Nueva Receta";
                 document.getElementById("recipeForm").reset();
                 document.getElementById("formRecipeId").value = "";
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+                document.getElementById('fileNameDisplay').innerText = "No se ha seleccionado imagen";
             }
 
             modal.classList.remove("hidden");
@@ -393,8 +369,8 @@
                 elaboracion: document.getElementById("formElaboracion").value,
                 puntosCriticos: document.getElementById("formPuntosCriticos").value,
                 imagenUrl: document.getElementById("formImagenUrl").value,
-                ingredientes: recipes.find(x => x.id === id)?.ingredientes || [],
-                alergenos: recipes.find(x => x.id === id)?.alergenos || [],
+                ingredientes: [],
+                alergenos: [],
                 fecha: new Date().toISOString().split('T')[0]
             };
 
@@ -408,7 +384,6 @@
             renderRecipes();
             closeEditModal();
 
-            // Guardar en Google Sheets
             try {
                 await fetch(API_URL, {
                     method: "POST",
@@ -422,7 +397,7 @@
 
         function startVoiceRecognition() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert("El dictado por voz no está soportado en este navegador. Utiliza Google Chrome.");
+                alert("El dictado por voz requiere Google Chrome.");
                 return;
             }
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -441,7 +416,7 @@
             const r = recipes.find(x => x.id === id);
             if (!r) return;
             
-            if (confirm(`¿Estás seguro de que deseas eliminar la receta "${r.nombre}"?`)) {
+            if (confirm(`¿Eliminar la receta "${r.nombre}"?`)) {
                 recipes = recipes.filter(x => x.id !== id);
                 renderRecipes();
 
@@ -452,7 +427,7 @@
                         body: JSON.stringify({ action: "DELETE_RECIPE", id: id })
                     });
                 } catch (e) {
-                    console.log("Acción notificada.");
+                    console.log("Acción enviada.");
                 }
             }
         }
@@ -467,85 +442,15 @@
                 <div class="flex justify-between items-start border-b pb-4 no-print">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-900">${r.nombre}</h2>
-                        <p class="text-xs text-slate-500">Cód Cuiner: ${r.codCuiner || 'N/A'} | Fecha: ${r.fecha} | Raciones: ${r.raciones}</p>
+                        <p class="text-xs text-slate-500">Cód Cuiner: ${r.codCuiner || 'N/A'} | Raciones: ${r.raciones}</p>
                     </div>
-                    <div class="flex gap-2">
-                        ${currentUser.rol !== 'consulta' ? `
-                            <button onclick="openRecipeForm('${r.id}'); closeModal();" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
-                                <i class="fa-solid fa-pen"></i> Editar
-                            </button>
-                            <button onclick="deleteRecipe('${r.id}'); closeModal();" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
-                                <i class="fa-solid fa-trash"></i> Eliminar
-                            </button>
-                        ` : ''}
-                        <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-print"></i> Imprimir / PDF
-                        </button>
-                    </div>
+                    <button onclick="window.print()" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-print"></i> PDF</button>
                 </div>
-
-                <div class="space-y-6 pt-2">
-                    <div class="border-b pb-3">
-                        <h1 class="text-xl font-bold text-slate-900 uppercase">${r.nombre} :: RECETA</h1>
-                        <div class="text-xs text-slate-600 grid grid-cols-2 gap-2 mt-2">
-                            <p><b>Restaurantes:</b> ${r.restaurantes.join(', ')}</p>
-                            <p><b>Tipo de plato:</b> ${r.categoria}</p>
-                            <p><b>Cod. Cuiner:</b> ${r.codCuiner || 'N/A'}</p>
-                            <p><b>Raciones:</b> ${r.raciones}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-xs uppercase text-slate-500 mb-2">INGREDIENTES</h3>
-                        <table class="w-full text-xs text-left border-collapse border border-slate-200">
-                            <thead class="bg-slate-100 border-b">
-                                <tr>
-                                    <th class="p-2 border">Un.</th>
-                                    <th class="p-2 border">Bruto</th>
-                                    <th class="p-2 border">Neto</th>
-                                    <th class="p-2 border">Nombre ingrediente</th>
-                                    <th class="p-2 border">Código Cuiner</th>
-                                    <th class="p-2 border">Mise-En-Place</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${r.ingredientes.map(i => `
-                                    <tr class="border-b">
-                                        <td class="p-2 border">${i.un}</td>
-                                        <td class="p-2 border">${i.bruto}</td>
-                                        <td class="p-2 border">${i.neto}</td>
-                                        <td class="p-2 border font-bold">${i.nombre}</td>
-                                        <td class="p-2 border">${i.cod}</td>
-                                        <td class="p-2 border">${i.mise}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 text-xs">
-                        <p><b>Alérgenos:</b> ${r.alergenos.length ? r.alergenos.join(', ') : 'Ninguno registrado'}</p>
-                        <p><b>Materiales:</b> ${r.material || 'No registrado'}</p>
-                    </div>
-
-                    <div class="text-xs space-y-1">
-                        <h3 class="font-bold uppercase text-slate-500">ELABORACIÓN:</h3>
-                        <p class="whitespace-pre-line leading-relaxed text-slate-700 bg-slate-50 p-3 rounded border">${r.elaboracion}</p>
-                    </div>
-
-                    ${r.puntosCriticos ? `
-                        <div class="text-xs space-y-1">
-                            <h3 class="font-bold uppercase text-red-600">PUNTOS CRÍTICOS:</h3>
-                            <p class="text-slate-700 bg-red-50 p-2 rounded border border-red-200">${r.puntosCriticos}</p>
-                        </div>
-                    ` : ''}
-
-                    ${r.imagenUrl ? `
-                        <div class="page-break pt-4">
-                            <h3 class="font-bold text-xs uppercase text-slate-500 mb-2">${r.nombre} :: IMAGEN EMPLATADO</h3>
-                            <img src="${r.imagenUrl}" class="max-h-80 rounded border object-cover">
-                        </div>
-                    ` : ''}
+                <div class="space-y-4 pt-2 text-xs">
+                    <p><b>Restaurantes:</b> ${r.restaurantes.join(', ')}</p>
+                    <p><b>Elaboración:</b></p>
+                    <p class="whitespace-pre-line bg-slate-50 p-3 rounded border">${r.elaboracion}</p>
+                    ${r.imagenUrl ? `<img src="${r.imagenUrl}" class="max-h-80 rounded border object-cover">` : ''}
                 </div>
             `;
             modal.classList.remove("hidden");
@@ -555,35 +460,10 @@
             document.getElementById("recipeDetailModal").classList.add("hidden");
         }
 
-        function cloneRecipe(id) {
-            const r = recipes.find(x => x.id === id);
-            if (!r) return;
-            const dest = prompt("¿A qué restaurante deseas clonar esta receta? (Ej: Sidreria del Asón, Nuevo Mundo, Cascarilla, Pruebas I+D)");
-            if (dest && !r.restaurantes.includes(dest)) {
-                const newRec = JSON.parse(JSON.stringify(r));
-                newRec.id = "REC-" + Math.floor(Math.random() * 90000 + 10000);
-                newRec.restaurantes = [dest];
-                newRec.nombre = newRec.nombre + " (Copia " + dest + ")";
-                recipes.push(newRec);
-                renderRecipes();
-                alert("Receta clonada con éxito para " + dest);
-            }
-        }
-
         function logout() {
             currentUser = null;
             document.getElementById("appView").classList.add("hidden");
             document.getElementById("loginView").classList.remove("hidden");
-        }
-
-        function toggleAdminPanel() {
-            const p = document.getElementById("adminPanel");
-            p.classList.toggle("hidden");
-        }
-
-        function printRecipe(id) {
-            viewDetail(id);
-            setTimeout(() => window.print(), 300);
         }
 
         initApp();
